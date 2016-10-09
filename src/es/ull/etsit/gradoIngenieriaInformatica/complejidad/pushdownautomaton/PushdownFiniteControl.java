@@ -1,5 +1,10 @@
 package es.ull.etsit.gradoIngenieriaInformatica.complejidad.pushdownautomaton;
 
-public class PushdownFiniteControl {
+import java.util.ArrayList;
 
+public class PushdownFiniteControl {
+	private PushdownAlphabet inputAlpha;
+	private PushdownAlphabet stackAlpha;
+	private ArrayList<State> stateSet;
+	private State currentState;
 }

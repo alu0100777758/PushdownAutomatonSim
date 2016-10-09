@@ -1,5 +1,7 @@
 package es.ull.etsit.gradoIngenieriaInformatica.complejidad.pushdownautomaton;
 
-public class PushdownStack {
+import java.util.Stack;
+
+public class PushdownStack extends Stack<String>{
 
 }

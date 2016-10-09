@@ -1,0 +1,17 @@
+node {
+  size: 64px;
+  fill-color: black;
+}
+node.marked {
+  fill-color: red;
+}
+node.start {
+  size: 10px, 15px;
+  shape: box;
+  fill-color: green;
+  stroke-mode: plain;
+  stroke-color: yellow;
+}
+edge {
+  shape: cubic-curve;
+}
