@@ -2,13 +2,21 @@ package es.ull.etsit.gradoIngenieriaInformatica.complejidad.pushdownautomaton;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.view.Viewer;
 
 public class Main {
 	public static void main(String[] args) {
 		
 		Graph parsed = PushDownParser.loadGraph("input0.txt");
 		System.out.println("Testing out");
-		parsed.display();
+		Viewer view = parsed.display();
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		view.disableAutoLayout();
 //		Graph graph = new SingleGraph("Tutorial 1");
 //
 //		graph.addNode("A");

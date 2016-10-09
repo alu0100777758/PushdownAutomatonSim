@@ -59,6 +59,8 @@ public class PushDownParser{
 			    }
 			     if(string.equals(stringy.get(3)))
 			    	 node.setAttribute("ui.class", "start");
+			     if(string.equals("q2"))
+			    	 node.setAttribute("ui.class", "current");
 			}
 		    for(int i = 6; i < stringy.size(); i++){
 		    	transitions = stringy.get(i).split("\\s+");

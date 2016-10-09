@@ -1,17 +1,35 @@
 node {
   size: 64px;
-  fill-color: black;
+  fill-color: 	#F0F8FF;
+  stroke-mode: plain;
+  stroke-color: black;
+  stroke-width: 2px;
 }
 node.marked {
   fill-color: red;
+  stroke-mode: plain;
+  stroke-color: black;
+  stroke-width: 5px;
 }
 node.start {
-  size: 10px, 15px;
-  shape: box;
-  fill-color: green;
+  size: 50px;
+}
+node.current{
   stroke-mode: plain;
-  stroke-color: yellow;
+  stroke-color: green;
+  stroke-width: 5px;
 }
 edge {
-  shape: cubic-curve;
+  shape: line;
+	fill-mode: dyn-plain;
+	fill-color: #222, #555, green, yellow;
+	arrow-size: 3px, 2px;
+  stroke-mode: plain;
+}
+graph{
+  padding: 50px;
+  text-alignment: above;
+  text-background-mode: rounded-box;
+  text-background-color: #F0F8FF;
+  text-padding: 15px;
 }
