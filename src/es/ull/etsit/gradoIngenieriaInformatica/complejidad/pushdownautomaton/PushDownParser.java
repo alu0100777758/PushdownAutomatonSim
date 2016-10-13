@@ -20,6 +20,9 @@ import scala.collection.parallel.ParIterableLike.Foreach;
 
 
 public class PushDownParser{
+	public static final String CURRENT_NODE = "current";
+	public static final String START_NODE = "start";
+
 	public static Graph loadGraph(String filePath){
 		Graph graph = new SingleGraph(filePath);
 		graph.addAttribute("ui.quality");
@@ -57,10 +60,11 @@ public class PushDownParser{
 		    			node.setAttribute("ui.class", "marked");
 		    		}
 			    }
+			    System.out.println("string : " + string +"\t stringy : " + stringy.get(3));
 			     if(string.equals(stringy.get(3)))
-			    	 node.setAttribute("ui.class", "start");
-			     if(string.equals("q2"))
-			    	 node.setAttribute("ui.class", "current");
+			    	 node.setAttribute("ui.class", node.getAttribute("ui.class") +  CURRENT_NODE);
+//			     if(string.equals("q2"))
+//			    	 node.setAttribute("ui.class", CURRENT_NODE);
 			}
 		    for(int i = 6; i < stringy.size(); i++){
 		    	transitions = stringy.get(i).split("\\s+");
