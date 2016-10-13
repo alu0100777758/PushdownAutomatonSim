@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -13,6 +15,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
@@ -20,7 +23,9 @@ public class PushdownControlsPane extends JPanel {
 	JButton openDir = new JButton("LoadFile");
 	JButton insta = new JButton("InstaEj");
 	JButton step = new JButton("Step");
+	int graphHead;
 	Graph graph;
+	Node currentNode = null;
 	PushdownStack stack = new PushdownStack();
 	PushdownTape inputTape = new PushdownTape();
 	JTextField inputInput = new JTextField("Input");
@@ -50,9 +55,7 @@ public class PushdownControlsPane extends JPanel {
 				        int returnVal = filechooser.showOpenDialog(null);
 				        if (returnVal == JFileChooser.APPROVE_OPTION) {
 				            File file = filechooser.getSelectedFile();
-				            graph = PushDownParser.loadGraph(file.getAbsolutePath());
-				            frame.setGraph(graph);
-				            System.out.println("Opening: " + file.getName());
+				            loadGraph(file);
 				        } else {
 				            System.out.println("Open command cancelled by user.");
 				        }
@@ -83,14 +86,33 @@ public class PushdownControlsPane extends JPanel {
 		
 
 	}
+	protected void loadGraph(File file) {
+		graph = PushDownParser.loadGraph(file.getAbsolutePath());
+        frame.setGraph(graph);
+        for (int i = 0; i < graph.getNodeCount(); i++) {
+	        Node node = graph.getNode(i);
+	        System.out.println("CurrentNod: " + node.getAttribute("ui.class"));
+	        if((boolean) node.getAttribute("startingNode")){
+	        	graphHead = i;
+	        	currentNode = node;
+	        	node.setAttribute("ui.class", "current");
+	        	break;
+	        }
+	        // Do something with node
+	 }
+        System.out.println("Opening: " + file.getName());
+	}
 	public void processNode(){
-		 for (int i = 0; i < graph.getNodeCount(); i++) {
-		        Node node = graph.getNode(i);
-		        System.out.println("CurrentNod: " + node.getAttribute("ui.class"));
-		        if(node.getAttribute("ui.class") == PushDownParser.CURRENT_NODE){
-		        	System.out.println("edge: " + node.getEdgeFrom(i).getAttribute("ui.label"));
-		        }
-		        // Do something with node
-		 }
+		for (int i = 0; i < graph.getNodeCount(); i++) {
+			Collection<Edge> edges = currentNode.getEdgeSet();
+			System.out.println("edgesSize: " + edges.size());
+//	        do{
+//	        	edge = (Edge)it.next();
+//			for (Edge edge2 : edges) {
+//				System.out.println("edgeLabel = " + edge2.getAttribute("ui.label"));
+//			}
+//	        	
+//	        }while(edge != null);
+		}
 	}
 }

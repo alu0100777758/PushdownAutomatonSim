@@ -20,7 +20,7 @@ public class PushdownStack extends JPanel{
 		JLabel label = new JLabel(symbol);
 		labels.push(label);
 		add(label);
-		repaint();
+		revalidate();
 		System.out.println("pushing");
 	};
 	public String pop(){

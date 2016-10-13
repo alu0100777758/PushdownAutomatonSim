@@ -10,6 +10,9 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 public class PushdownTape extends JTextArea{
 	int pos = 0;
+	public PushdownTape(){
+		super("input");
+	}
 	public boolean next(){
 		pos++;
 		if(pos <= getText().length()){

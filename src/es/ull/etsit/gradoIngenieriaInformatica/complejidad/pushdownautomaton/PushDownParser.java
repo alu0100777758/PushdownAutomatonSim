@@ -58,11 +58,14 @@ public class PushDownParser{
 			    	System.out.println("Comparing: " + finals);
 		    		if(string.equals(finals)){
 		    			node.setAttribute("ui.class", "marked");
+		    			node.setAttribute("finalState", true);
 		    		}
 			    }
 			    System.out.println("string : " + string +"\t stringy : " + stringy.get(3));
-			     if(string.equals(stringy.get(3)))
-			    	 node.setAttribute("ui.class", node.getAttribute("ui.class") +  CURRENT_NODE);
+			     if(string.equals(stringy.get(3))){
+			    	 node.setAttribute("startingNode", true);
+			    	 node.setAttribute("ui.class", CURRENT_NODE);
+			     }
 //			     if(string.equals("q2"))
 //			    	 node.setAttribute("ui.class", CURRENT_NODE);
 			}
