@@ -1,0 +1,9 @@
+q1 q2 q3 # conjunto Q
+a1 a2 a3 # conjunto S
+q1 # estado inicial
+A1 # símbolo inicial de la pila
+q1 # conjunto F
+q1 a1 A1 q2 A2
+q1 a1 A1 q1 A3
+q1 a2 A1 q3 A2
+q3 a3 A2 q2 A2

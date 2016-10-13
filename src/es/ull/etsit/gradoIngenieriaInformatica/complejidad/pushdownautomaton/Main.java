@@ -1,5 +1,9 @@
 package es.ull.etsit.gradoIngenieriaInformatica.complejidad.pushdownautomaton;
 
+import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
+
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
@@ -7,9 +11,17 @@ import org.graphstream.ui.view.Viewer;
 public class Main {
 	public static void main(String[] args) {
 		
-		Graph parsed = PushDownParser.loadGraph("input0.txt");
+		//Graph parsed = PushDownParser.loadGraph("input0.txt");
 		System.out.println("Testing out");
-		Viewer view = parsed.display();
+		//Viewer view = parsed.display();
+		
+		//1. Create the frame.
+		JFrame frame = new PushdownFrame();
+		//4. Size the frame.
+		frame.pack();
+
+		//5. Show it.
+		frame.setVisible(true);
 //		try {
 //			Thread.sleep(1000);
 //		} catch (InterruptedException e) {
