@@ -15,6 +15,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.spriteManager.*;
 
 import scala.collection.parallel.ParIterableLike.Foreach;
 
@@ -37,6 +38,7 @@ public class PushDownParser{
 		graph.addAttribute("ui.quality");
 		graph.addAttribute("ui.antialias");
 		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		SpriteManager sman = new SpriteManager(graph);
 		try(BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 			ArrayList<String> stringy = new ArrayList<>();
 			int lineCount = 0;
@@ -84,6 +86,9 @@ public class PushDownParser{
 		    for(int i = 6; i < stringy.size(); i++){
 		    	transitions = stringy.get(i).split("\\s+");
 				    Edge edge = graph.addEdge("node"+(i-6), transitions[0], transitions[3]);
+				    Sprite s = sman.addSprite("arrowHead" + edge.getId());
+					 s.setPosition(0.95, 0, 0);
+				    s.attachToEdge(edge.getId());
 				    edge.addAttribute(UI_LABEL, stringy.get(i));
 				    for(int x = 0; x < 4; x++){
 				    edge.addAttribute(ATRIBUTES[x], transitions[x]);

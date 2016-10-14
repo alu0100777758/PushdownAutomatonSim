@@ -1,8 +1,6 @@
 node.current{
   stroke-mode: plain;
   stroke-color: green;
-  stroke-mode: plain;
-  stroke-color: green;
   stroke-width: 5px;
 }
 node {
@@ -13,10 +11,8 @@ node {
   stroke-width: 2px;
 }
 node.marked {
-  fill-color: #779;
+  fill-color: #7f9;
   stroke-mode: plain;
-  stroke-color: black;
-  stroke-width: 5px;
 }
 node.start {
   size: 50px;
@@ -35,4 +31,8 @@ graph{
   text-background-mode: rounded-box;
   text-background-color: #F0F8FF;
   text-padding: 15px;
+}
+sprite{
+  shape: triangle;
+  size: 30px;
 }

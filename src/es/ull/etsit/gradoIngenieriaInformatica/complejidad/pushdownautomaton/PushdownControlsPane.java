@@ -6,9 +6,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -20,17 +22,20 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import scala.collection.parallel.ParIterableLike.Foreach;
 import sun.util.resources.cldr.ts.CurrencyNames_ts;
 
 public class PushdownControlsPane extends JPanel {
-	public static final String DEFAULT_INPUT = "a1 a2 a3 a4";
+	// TODO en cada nodo actual escribir sus producciones
+	public static final String DEFAULT_INPUT = "A S A S";
 	JButton openDir = new JButton("LoadFile");
 	JButton insta = new JButton("InstaEj");
 	JButton step = new JButton("Step");
 	int graphHead;
 	Graph graph;
-	Node currentNode = null;
+	ArrayList<Node> currentNodes = new ArrayList<>();
 	PushdownStack stack = new PushdownStack();
 	PushdownTape inputTape = new PushdownTape(DEFAULT_INPUT);
 	JTextField inputInput = new JTextField(DEFAULT_INPUT);
@@ -43,6 +48,8 @@ public class PushdownControlsPane extends JPanel {
 		System.out.println("adding controls");
 		setPreferredSize(new Dimension(100, 1000));
 		setMaximumSize(getPreferredSize());
+		inputInput.setPreferredSize(new Dimension(100,20));
+		inputInput.setMaximumSize(getPreferredSize());
 		setActions();
 		add(openDir);
 		add(inputTape);
@@ -69,10 +76,13 @@ public class PushdownControlsPane extends JPanel {
 		{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				processNode();
+				for (Node node : (ArrayList<Node>)currentNodes.clone()) {
+					processNode(node);
+				}
 				if(inputTape.next())
 					end();
-				repaint();
+				frame.revalidate();
+				frame.repaint();
 			}
 		});	
 		inputInput.addKeyListener(new KeyAdapter()
@@ -82,7 +92,6 @@ public class PushdownControlsPane extends JPanel {
 		        if (e.getKeyCode() == KeyEvent.VK_ENTER)
 		        {
 		          inputTape.setInput(inputInput.getText());
-		          inputTape.resetHighlight();
 		        }
 		      }
 		    });
@@ -92,7 +101,11 @@ public class PushdownControlsPane extends JPanel {
 	}
 	private void end() {
 		String message;
-		if(currentNode.getAttribute(PushDownParser.FINAL_STATE) != null || stack.isEmpty())
+		boolean atFinalState = false;
+		for (Node node : currentNodes) {
+			atFinalState = atFinalState || (node.getAttribute(PushDownParser.FINAL_STATE) != null);
+		}
+		if(atFinalState || stack.isEmpty())
 			message = "PASS";
 		else
 			message = "NOT PASS";
@@ -106,7 +119,8 @@ public class PushdownControlsPane extends JPanel {
 	        System.out.println("CurrentNod: " + node.getAttribute("ui.class"));
 	        if(node.getAttribute("startingNode") != null){
 	        	graphHead = i;
-	        	currentNode = node;
+	        	currentNodes.clear();
+	        	currentNodes.add(node);
 	        	node.setAttribute("ui.class", "current");
 	        	break;
 	        }
@@ -115,27 +129,41 @@ public class PushdownControlsPane extends JPanel {
         System.out.println("Opening: " + file.getName());
         frame.revalidate();
         frame.repaint();
+        inputTape.reset();
 	}
-	public void processNode(){
+	public void processNode(Node currentNode){
 			for (Edge edge : graph.getEachEdge()) {
 				System.out.println(" edge:  " + edge.getAttribute("ui.label"));
 				System.out.println("sourceNod = " + edge.getSourceNode());
 				if(edge.getSourceNode() == currentNode){
 					System.out.println("is currentNode" );
+					if(edge.getAttribute(PushDownParser.TAPE_SYMBOL).equals(".")){
+						Node nnode = edge.getTargetNode();
+						currentNodes.add(nnode);
+										}
 					if(  isValidTransition(edge)){
 						System.out.println("validEdge :" +  edge.getAttribute("ui.label"));
-						switchCurrentNode(edge.getTargetNode());
-						if(!stack.isEmpty()) /// or no pop
+						switchCurrentNode(currentNode, edge.getTargetNode());
+						if(!stack.isEmpty())
 							stack.pop();
 						stack.push(edge.getAttribute(PushDownParser.PUSH_SYMBOL));//split y modificar isercion
+						revalidate();
+					}else{
+						currentNodes.remove(currentNode);
 					}
+						
 				}
 			}
 	}
-	private void switchCurrentNode(Node targetNode) {
-		targetNode.removeAttribute("ui.class");
-		currentNode.removeAttribute("ui.class");
-		targetNode.setAttribute("ui.class", PushDownParser.CURRENT_NODE);
+	private void switchCurrentNode(Node currentNode, Node targetNode) {
+		if(targetNode.getAttribute("finalState")!= null)
+			targetNode.addAttribute("ui.class","marked, current");
+		else
+			targetNode.addAttribute("ui.class","current");
+		if(currentNode.getAttribute("finalState")!= null)
+			currentNode.addAttribute("ui.class","marked");
+		else
+			currentNode.removeAttribute("ui.class");
 	}
 	private boolean isValidTransition(Edge edge) {
 		boolean rightInput = edge.getAttribute(PushDownParser.TAPE_SYMBOL).equals(inputTape.getSymbol());

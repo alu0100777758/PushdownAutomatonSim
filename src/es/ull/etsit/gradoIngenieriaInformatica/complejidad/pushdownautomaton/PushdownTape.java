@@ -1,6 +1,7 @@
 package es.ull.etsit.gradoIngenieriaInformatica.complejidad.pushdownautomaton;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
 
 import javax.swing.JTextArea;
@@ -12,14 +13,13 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import com.sun.corba.se.spi.orbutil.fsm.Input;
 
 public class PushdownTape extends JTextArea{
-	// si tiene produccion vacia añadr nodo a la lst de currents
-	// avanzar cada nodo;
-	// en cada nodo actual escribir sus producciones
 	int pos = 0;
 	int visited = 0;
 	String[] tape;
 	public PushdownTape(String input){
 		setInput(input);
+		setPreferredSize(new Dimension(100,20));
+		setMaximumSize(getPreferredSize());
 	}
 	public boolean next(){
 		pos++;
@@ -34,8 +34,9 @@ public class PushdownTape extends JTextArea{
 			return true;
 		}
 	}
-	public void resetHighlight(){
+	public void reset(){
 		pos = 0;
+		visited = 0;
 		updateTape();
 	}
 	void updateTape(){
@@ -63,5 +64,6 @@ public class PushdownTape extends JTextArea{
 		tape = input.split("\\s+");
 		setText(input);
 		System.out.println("tape: " + tape);
+		reset();
 	}
 }
