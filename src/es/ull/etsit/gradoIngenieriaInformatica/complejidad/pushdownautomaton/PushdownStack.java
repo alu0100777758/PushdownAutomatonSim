@@ -29,4 +29,10 @@ public class PushdownStack extends JPanel{
 		repaint();
 		return outLabel.getText();
 	}
+	public String getCurrentTop(){
+		return labels.lastElement().getText();
+	}
+	public boolean isEmpty(){
+		return labels.isEmpty();
+	}
 }

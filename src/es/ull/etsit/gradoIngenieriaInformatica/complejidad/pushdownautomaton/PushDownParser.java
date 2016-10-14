@@ -20,6 +20,12 @@ import scala.collection.parallel.ParIterableLike.Foreach;
 
 
 public class PushDownParser{
+	private static final String TARGET_NODE = "TargetNode";
+	public static final String FROM_NODE = "fromNode";
+	public static final String FINAL_STATE = "finalState";
+	public static final String PUSH_SYMBOL = "pushSymbol";
+	public static final String POP_SYMBOL = "popSymbol";
+	public static final String TAPE_SYMBOL = "tapeSymbol";
 	public static final String CURRENT_NODE = "current";
 	public static final String START_NODE = "start";
 
@@ -58,11 +64,13 @@ public class PushDownParser{
 			    	System.out.println("Comparing: " + finals);
 		    		if(string.equals(finals)){
 		    			node.setAttribute("ui.class", "marked");
-		    			node.setAttribute("finalState", true);
+		    			node.setAttribute(FINAL_STATE, true);
 		    		}
 			    }
 			    System.out.println("string : " + string +"\t stringy : " + stringy.get(3));
-			     if(string.equals(stringy.get(3))){
+			    System.out.println("string : " + string.length() +"\t stringy : " + stringy.get(3).length());
+			     if(string.equals(stringy.get(3).substring(0, stringy.get(3).length()-1))){
+			    	 System.out.println("entra, son iguales");
 			    	 node.setAttribute("startingNode", true);
 			    	 node.setAttribute("ui.class", CURRENT_NODE);
 			     }
@@ -77,6 +85,11 @@ public class PushDownParser{
 				}
 				    Edge edge = graph.addEdge(stringy.get(i), transitions[0], transitions[3]);
 				    edge.addAttribute("ui.label", stringy.get(i));
+				    edge.addAttribute(FROM_NODE, transitions[0]);
+				    edge.addAttribute(TAPE_SYMBOL, transitions[1]);
+				    edge.addAttribute(POP_SYMBOL, transitions[2]);
+				    edge.addAttribute(TARGET_NODE, transitions[3]);
+				    edge.addAttribute(PUSH_SYMBOL, transitions[4]);
 		    }
 		    // line is not visible here.
 		} catch (FileNotFoundException e) {

@@ -19,6 +19,8 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
+import scala.collection.parallel.ParIterableLike.Foreach;
+
 public class PushdownControlsPane extends JPanel {
 	JButton openDir = new JButton("LoadFile");
 	JButton insta = new JButton("InstaEj");
@@ -44,8 +46,7 @@ public class PushdownControlsPane extends JPanel {
 		add(stack);
 		add(step);
 		add(inputInput);
-		 graph=PushDownParser.loadGraph("input0.txt");
-		 frame.setGraph(graph);
+		loadGraph(new File("input0.txt"));
 	}
 	private void setActions(){
 		openDir.addActionListener(new ActionListener()
@@ -66,7 +67,6 @@ public class PushdownControlsPane extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				inputTape.next();
-				stack.push("yee");
 				processNode();
 				repaint();
 			}
@@ -103,9 +103,25 @@ public class PushdownControlsPane extends JPanel {
         System.out.println("Opening: " + file.getName());
 	}
 	public void processNode(){
-		for (int i = 0; i < graph.getNodeCount(); i++) {
-			Collection<Edge> edges = currentNode.getEdgeSet();
-			System.out.println("edgesSize: " + edges.size());
+		//for (int i = 0; i < graph.getNodeCount(); i++) {
+			//Collection<Edge> edges = currentNode.getEdgeSet();
+//			if(currentNode.getEdgeSet() != null)
+//				System.out.println("notNull edgeset");
+			for (Edge edge : graph.getEachEdge()) {
+				System.out.println(" edge:  " + edge.getAttribute("ui.label"));
+				System.out.println("sourceNod = " + edge.getSourceNode());
+				if(edge.getSourceNode() == currentNode){
+					System.out.println("is currentNode" );
+					if(  isValidTransition(edge)){
+						System.out.println("validEdge :" +  edge.getAttribute("ui.label"));
+						switchCurrentNode(edge.getTargetNode());
+						stack.pop();
+						stack.push(edge.getAttribute(PushDownParser.PUSH_SYMBOL));
+					}
+				}
+			}
+				System.out.println("notNull edgeset");
+			//System.out.println("edgesSize: " + edges.size());
 //	        do{
 //	        	edge = (Edge)it.next();
 //			for (Edge edge2 : edges) {
@@ -113,6 +129,18 @@ public class PushdownControlsPane extends JPanel {
 //			}
 //	        	
 //	        }while(edge != null);
-		}
+	//	}
+	}
+	private void switchCurrentNode(Node targetNode) {
+		targetNode.removeAttribute("ui.class");
+		currentNode.removeAttribute("ui.class");
+		targetNode.setAttribute("ui.class", PushDownParser.CURRENT_NODE);
+	}
+	private boolean isValidTransition(Edge edge) {
+		System.out.println("aqui explota:");
+		boolean rightInput = edge.getAttribute(PushDownParser.TAPE_SYMBOL).equals(inputTape.getSymbol().substring(0,1));
+		boolean rightStackState = (stack.isEmpty() || edge.getAttribute(PushDownParser.POP_SYMBOL).equals(stack.getCurrentTop()) );
+		return  rightInput && rightStackState;
+				
 	}
 }
