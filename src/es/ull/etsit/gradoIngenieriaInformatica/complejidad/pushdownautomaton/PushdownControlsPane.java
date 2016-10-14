@@ -12,6 +12,7 @@ import java.util.Iterator;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -20,8 +21,10 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
 import scala.collection.parallel.ParIterableLike.Foreach;
+import sun.util.resources.cldr.ts.CurrencyNames_ts;
 
 public class PushdownControlsPane extends JPanel {
+	public static final String DEFAULT_INPUT = "a1 a2 a3 a4";
 	JButton openDir = new JButton("LoadFile");
 	JButton insta = new JButton("InstaEj");
 	JButton step = new JButton("Step");
@@ -29,8 +32,8 @@ public class PushdownControlsPane extends JPanel {
 	Graph graph;
 	Node currentNode = null;
 	PushdownStack stack = new PushdownStack();
-	PushdownTape inputTape = new PushdownTape();
-	JTextField inputInput = new JTextField("Input");
+	PushdownTape inputTape = new PushdownTape(DEFAULT_INPUT);
+	JTextField inputInput = new JTextField(DEFAULT_INPUT);
 	JFileChooser filechooser = new JFileChooser(System.getProperty("user.dir"));
 	PushdownFrame frame;
 	public PushdownControlsPane(PushdownFrame frame) {
@@ -66,8 +69,9 @@ public class PushdownControlsPane extends JPanel {
 		{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				inputTape.next();
 				processNode();
+				if(inputTape.next())
+					end();
 				repaint();
 			}
 		});	
@@ -77,7 +81,7 @@ public class PushdownControlsPane extends JPanel {
 		      {
 		        if (e.getKeyCode() == KeyEvent.VK_ENTER)
 		        {
-		          inputTape.setText(inputInput.getText());
+		          inputTape.setInput(inputInput.getText());
 		          inputTape.resetHighlight();
 		        }
 		      }
@@ -86,27 +90,33 @@ public class PushdownControlsPane extends JPanel {
 		
 
 	}
+	private void end() {
+		String message;
+		if(currentNode.getAttribute(PushDownParser.FINAL_STATE) != null || stack.isEmpty())
+			message = "PASS";
+		else
+			message = "NOT PASS";
+		JOptionPane.showMessageDialog(frame, message);
+	}
 	protected void loadGraph(File file) {
 		graph = PushDownParser.loadGraph(file.getAbsolutePath());
         frame.setGraph(graph);
         for (int i = 0; i < graph.getNodeCount(); i++) {
 	        Node node = graph.getNode(i);
 	        System.out.println("CurrentNod: " + node.getAttribute("ui.class"));
-	        if((boolean) node.getAttribute("startingNode")){
+	        if(node.getAttribute("startingNode") != null){
 	        	graphHead = i;
 	        	currentNode = node;
 	        	node.setAttribute("ui.class", "current");
 	        	break;
 	        }
-	        // Do something with node
+	       
 	 }
         System.out.println("Opening: " + file.getName());
+        frame.revalidate();
+        frame.repaint();
 	}
 	public void processNode(){
-		//for (int i = 0; i < graph.getNodeCount(); i++) {
-			//Collection<Edge> edges = currentNode.getEdgeSet();
-//			if(currentNode.getEdgeSet() != null)
-//				System.out.println("notNull edgeset");
 			for (Edge edge : graph.getEachEdge()) {
 				System.out.println(" edge:  " + edge.getAttribute("ui.label"));
 				System.out.println("sourceNod = " + edge.getSourceNode());
@@ -115,21 +125,12 @@ public class PushdownControlsPane extends JPanel {
 					if(  isValidTransition(edge)){
 						System.out.println("validEdge :" +  edge.getAttribute("ui.label"));
 						switchCurrentNode(edge.getTargetNode());
-						stack.pop();
-						stack.push(edge.getAttribute(PushDownParser.PUSH_SYMBOL));
+						if(!stack.isEmpty()) /// or no pop
+							stack.pop();
+						stack.push(edge.getAttribute(PushDownParser.PUSH_SYMBOL));//split y modificar isercion
 					}
 				}
 			}
-				System.out.println("notNull edgeset");
-			//System.out.println("edgesSize: " + edges.size());
-//	        do{
-//	        	edge = (Edge)it.next();
-//			for (Edge edge2 : edges) {
-//				System.out.println("edgeLabel = " + edge2.getAttribute("ui.label"));
-//			}
-//	        	
-//	        }while(edge != null);
-	//	}
 	}
 	private void switchCurrentNode(Node targetNode) {
 		targetNode.removeAttribute("ui.class");
@@ -137,9 +138,9 @@ public class PushdownControlsPane extends JPanel {
 		targetNode.setAttribute("ui.class", PushDownParser.CURRENT_NODE);
 	}
 	private boolean isValidTransition(Edge edge) {
-		System.out.println("aqui explota:");
-		boolean rightInput = edge.getAttribute(PushDownParser.TAPE_SYMBOL).equals(inputTape.getSymbol().substring(0,1));
+		boolean rightInput = edge.getAttribute(PushDownParser.TAPE_SYMBOL).equals(inputTape.getSymbol());
 		boolean rightStackState = (stack.isEmpty() || edge.getAttribute(PushDownParser.POP_SYMBOL).equals(stack.getCurrentTop()) );
+		System.out.println("input: " + rightInput + "   stack" + rightStackState);
 		return  rightInput && rightStackState;
 				
 	}

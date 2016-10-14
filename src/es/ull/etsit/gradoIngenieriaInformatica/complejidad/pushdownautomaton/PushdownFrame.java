@@ -30,7 +30,7 @@ public class PushdownFrame extends JFrame {
 		viewer.enableAutoLayout();
 		View view = viewer.addDefaultView(false);
 		this.view = view;
-		add((Component) view);
+		add((Component) view, 0);
 		repaint();
 	}
 

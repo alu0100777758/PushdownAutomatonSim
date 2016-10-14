@@ -1,4 +1,4 @@
-package es.ull.etsit.gradoIngenieriaInformatica.complejidad.pushdownautomaton;
+ package es.ull.etsit.gradoIngenieriaInformatica.complejidad.pushdownautomaton;
 
 import javax.swing.JFrame;
 

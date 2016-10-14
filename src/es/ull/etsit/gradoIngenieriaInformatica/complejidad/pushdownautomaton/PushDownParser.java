@@ -13,6 +13,7 @@ import java.util.Scanner;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import scala.collection.parallel.ParIterableLike.Foreach;
@@ -20,6 +21,7 @@ import scala.collection.parallel.ParIterableLike.Foreach;
 
 
 public class PushDownParser{
+	private static final String UI_LABEL = "ui.label";
 	private static final String TARGET_NODE = "TargetNode";
 	public static final String FROM_NODE = "fromNode";
 	public static final String FINAL_STATE = "finalState";
@@ -28,9 +30,10 @@ public class PushDownParser{
 	public static final String TAPE_SYMBOL = "tapeSymbol";
 	public static final String CURRENT_NODE = "current";
 	public static final String START_NODE = "start";
-
+	public static final String [] ATRIBUTES = {FROM_NODE, TAPE_SYMBOL, POP_SYMBOL, TARGET_NODE, PUSH_SYMBOL};
+	public static final String [] ATRIBUTES_NAMES = {"FROM_NODE", "TAPE_SYMBOL", "POP_SYMBOL", "TARGET_NODE", "PUSH_SYMBOL"};
 	public static Graph loadGraph(String filePath){
-		Graph graph = new SingleGraph(filePath);
+		Graph graph = new MultiGraph(filePath);
 		graph.addAttribute("ui.quality");
 		graph.addAttribute("ui.antialias");
 		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
@@ -49,7 +52,8 @@ public class PushDownParser{
 		    String [] transitions;
 		    for(String line; (line = br.readLine()) != null; ) {
 		    	line = basicExpansion(line);
-		    	stringy.add(line);
+		    	if(line.length() >0)
+		    		stringy.add(line);
 		        // process the line.
 		    }
 		    System.out.println("starting: " + stringy.get(3));
@@ -59,7 +63,7 @@ public class PushDownParser{
 		    for (String string : states) {
 			    System.out.println("state: " + string);
 			    Node node = graph.addNode(string);
-			    node.addAttribute("ui.label", string);
+			    node.addAttribute(UI_LABEL, string);
 			    for(String finals : finalState){
 			    	System.out.println("Comparing: " + finals);
 		    		if(string.equals(finals)){
@@ -69,7 +73,7 @@ public class PushDownParser{
 			    }
 			    System.out.println("string : " + string +"\t stringy : " + stringy.get(3));
 			    System.out.println("string : " + string.length() +"\t stringy : " + stringy.get(3).length());
-			     if(string.equals(stringy.get(3).substring(0, stringy.get(3).length()-1))){
+			     if(string.equals(stringy.get(3))){
 			    	 System.out.println("entra, son iguales");
 			    	 node.setAttribute("startingNode", true);
 			    	 node.setAttribute("ui.class", CURRENT_NODE);
@@ -79,17 +83,20 @@ public class PushDownParser{
 			}
 		    for(int i = 6; i < stringy.size(); i++){
 		    	transitions = stringy.get(i).split("\\s+");
-		    	// TODO hacer un check del formato
-		    	for (String string : transitions) {
-		    		System.out.println("transitionData: " + string);
-				}
-				    Edge edge = graph.addEdge(stringy.get(i), transitions[0], transitions[3]);
-				    edge.addAttribute("ui.label", stringy.get(i));
-				    edge.addAttribute(FROM_NODE, transitions[0]);
-				    edge.addAttribute(TAPE_SYMBOL, transitions[1]);
-				    edge.addAttribute(POP_SYMBOL, transitions[2]);
-				    edge.addAttribute(TARGET_NODE, transitions[3]);
-				    edge.addAttribute(PUSH_SYMBOL, transitions[4]);
+				    Edge edge = graph.addEdge("node"+(i-6), transitions[0], transitions[3]);
+				    edge.addAttribute(UI_LABEL, stringy.get(i));
+				    for(int x = 0; x < 4; x++){
+				    edge.addAttribute(ATRIBUTES[x], transitions[x]);
+				    }
+				    String pushS = "";
+				    for(int x = 0; x < transitions.length; x++){
+					   pushS = " " + transitions[x];
+					 }
+				    edge.addAttribute(PUSH_SYMBOL, pushS);
+				    for(int x = 0; x < transitions.length - 1; x++){
+					    System.out.println("transitionData: " + ATRIBUTES_NAMES[x] + ": " + transitions[x] );
+
+						 }
 		    }
 		    // line is not visible here.
 		} catch (FileNotFoundException e) {
